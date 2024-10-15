@@ -1,18 +1,9 @@
 import base64
 import sys
 from os import listdir
-from os.path import isfile, join, isdir
+from os.path import isfile, join
 from pathlib import Path
 from re import split
-
-if len(sys.argv) <= 1:
-    print('need absolute path to dir with files in 1st arg')
-    sys.exit(1)
-
-dir = sys.argv[1]
-if not isdir(dir):
-    print('need absolute path to dir with files in 1st arg')
-    sys.exit(1)
 
 
 def natural_sort(l):
@@ -21,15 +12,30 @@ def natural_sort(l):
     return sorted(l, key=alphanum_key)
 
 
-files = [f for f in listdir(dir) if isfile(join(dir, f))]
-files = natural_sort(files)
+def decode_file(input, output):
+    base64.decode(open(input, "rb"), open(output, "wb"))
 
-file = [f for f in files if '-0.part' in f][0].replace('-0.part', '')
-with open(f'{dir}/{file}', 'w', encoding='utf8') as out_f:
-    for _file in files:
-        with open(dir + '/' + _file, 'r', encoding='utf8') as in_f:
-            out_f.write(in_f.read())
-new_file_name = file.replace(".base64", "")
-base64.decode(open(f'{dir}/{file}', "rb"), open(f'{dir}/{new_file_name}', "wb"))
-Path(f'{dir}/{file}').unlink()
-print(f'file written in {dir}/{new_file_name}')
+
+def main():
+    dir = sys.argv[1]
+
+    files = [f for f in listdir(dir) if isfile(join(dir, f))]
+    files = natural_sort(files)
+
+    file = [f for f in files if '-0.part' in f][0].replace('-0.part', '')
+    with open(f'{dir}/{file}', 'w', encoding='utf8') as out_file:
+        for _file in files:
+            with open(dir + '/' + _file, 'r', encoding='utf8') as in_file:
+                out_file.write(in_file.read())
+    new_file_name = file.replace(".base64", "")
+    decode_file(f'{dir}/{file}', f'{dir}/{new_file_name}')
+    Path(f'{dir}/{file}').unlink()
+    print(f'file written in {dir}/{new_file_name}')
+
+
+if __name__ == '__main__':
+    if len(sys.argv) <= 1 or not Path(sys.argv[1]).is_dir():
+        print('need absolute path to dir with files in 1st arg')
+        sys.exit(1)
+    else:
+        main()
