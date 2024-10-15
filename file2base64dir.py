@@ -3,7 +3,7 @@ import ntpath
 import sys
 from pathlib import Path
 
-lines_per_file = 320000
+lines_per_file = 240000
 
 
 def encode_file(input, output):
