@@ -4,6 +4,8 @@ import sys
 from os.path import isabs
 from os import system, mkdir, remove
 
+openssl = '"C:/Program Files/Git/mingw64/bin/openssl.exe"'
+
 if len(sys.argv) <= 1:
     print('need absolute path to file in 1st arg')
     sys.exit(1)
@@ -14,7 +16,7 @@ if not isabs(file):
     sys.exit(1)
 
 base64_filename = file + '.base64'
-system(f'openssl base64 -in "{file}" -out "{base64_filename}"')
+system(f'{openssl} base64 -in "{file}" -out "{base64_filename}"')
 
 lines_per_file = 320000
 smallfile = None
