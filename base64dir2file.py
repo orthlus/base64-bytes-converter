@@ -1,6 +1,8 @@
+import base64
 import sys
+from os import listdir
 from os.path import isfile, join, isdir
-from os import listdir, system, remove
+from pathlib import Path
 from re import split
 
 if len(sys.argv) <= 1:
@@ -28,6 +30,6 @@ with open(f'{dir}/{file}', 'w', encoding='utf8') as out_f:
         with open(dir + '/' + _file, 'r', encoding='utf8') as in_f:
             out_f.write(in_f.read())
 new_file_name = file.replace(".base64", "")
-system(f'openssl base64 -d -in "{dir}/{file}" -out "{dir}/{new_file_name}"')
-remove(f'{dir}/{file}')
+base64.decode(open(f'{dir}/{file}', "rb"), open(f'{dir}/{new_file_name}', "wb"))
+Path(f'{dir}/{file}').unlink()
 print(f'file written in {dir}/{new_file_name}')

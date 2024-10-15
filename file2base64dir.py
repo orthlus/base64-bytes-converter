@@ -1,10 +1,8 @@
+import base64
 import ntpath
 import sys
-
 from os.path import isabs
-from os import system, mkdir, remove
-
-openssl = '"C:/Program Files/Git/mingw64/bin/openssl.exe"'
+from pathlib import Path
 
 if len(sys.argv) <= 1:
     print('need absolute path to file in 1st arg')
@@ -16,13 +14,13 @@ if not isabs(file):
     sys.exit(1)
 
 base64_filename = file + '.base64'
-system(f'{openssl} base64 -in "{file}" -out "{base64_filename}"')
+base64.encode(open(file, "rb"), open(base64_filename, "wb"))
 
 lines_per_file = 320000
 smallfile = None
 index = 0
 small_files_dir = base64_filename + '_parts'
-mkdir(small_files_dir)
+Path(small_files_dir).mkdir(exist_ok=True)
 with open(base64_filename, encoding='utf8') as in_f:
     for lineno, line in enumerate(in_f):
         if lineno % lines_per_file == 0:
@@ -34,5 +32,5 @@ with open(base64_filename, encoding='utf8') as in_f:
     if smallfile:
         smallfile.close()
 
-remove(base64_filename)
+Path(base64_filename).unlink()
 print('written file in to ' + small_files_dir)
